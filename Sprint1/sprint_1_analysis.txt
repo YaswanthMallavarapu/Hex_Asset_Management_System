@@ -1,0 +1,17 @@
+Sprint 1 Analysis
+
+1.Have to implement application & login
+
+2.Based on role redirect to users dashboard or admin dashboard
+
+3.Admin can add assets or modify assets in asset catalogue
+
+4.Users can request an asset
+
+5.Users can request service for currently holding asset
+
+6.Admin can create audit for assets
+
+7.Users can return the asset received
+
+8.Admin can accept/reject asset request by user

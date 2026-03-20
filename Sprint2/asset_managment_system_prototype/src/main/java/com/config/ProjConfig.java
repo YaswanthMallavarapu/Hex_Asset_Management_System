@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@ComponentScan("org.hibernate.*")
+@ComponentScan("com.*")
 @EnableTransactionManagement
 public class ProjConfig {
 

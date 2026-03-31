@@ -16,21 +16,23 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@AllArgsConstructor
 public class SecurityConfig {
 
+
     private final UserService userService;
-    public SecurityConfig(UserService userService) {
-        this.userService = userService;
-    }
+    private final JwtFilter jwtFilter;
+
 
 
     @Bean
     public SecurityFilterChain SecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.OPTIONS,"/**")
                         .permitAll()
@@ -54,7 +56,7 @@ public class SecurityConfig {
                                 .hasAnyAuthority("ADMIN","EMPLOYEE")
                                 .requestMatchers(HttpMethod.POST,"/api/asset-request/add/{employeeId}/{assetId}")
                                 .hasAnyAuthority("ADMIN","EMPLOYEE")
-                                .requestMatchers(HttpMethod.GET,"/api/asset-request//get-all")
+                                .requestMatchers(HttpMethod.GET,"/api/asset-request/get-all")
                                 .hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.POST,"/api/asset-allocation/allocate/{employeeId}/{assetId}/{assetRequestId}")
                                 .hasAnyAuthority("ADMIN")
@@ -76,23 +78,24 @@ public class SecurityConfig {
 
 
 //                for development no need of user credentials
-//                        .anyRequest().permitAll()
+                        .anyRequest().permitAll()
 //                for production i have to enable this so security will be checked
-                        .anyRequest().authenticated()
+//                        .anyRequest().authenticated()
 
                 );
-        http.httpBasic(Customizer.withDefaults());  //Spring understand that i am using this technique
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http.httpBasic(Customizer.withDefaults());  //Spring understands that i am using this technique
         return http.build();
     }
 
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder
-    ){
-        DaoAuthenticationProvider authenticationProvider=new DaoAuthenticationProvider(userService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder);
-        return new ProviderManager(authenticationProvider);
-    }
+//    @Bean
+//    public AuthenticationManager authenticationManager(
+//            UserDetailsService userDetailsService,
+//            PasswordEncoder passwordEncoder
+//    ){
+//        DaoAuthenticationProvider authenticationProvider=new DaoAuthenticationProvider(userService);
+//        authenticationProvider.setPasswordEncoder(passwordEncoder);
+//        return new ProviderManager(authenticationProvider);
+//    }
 }
